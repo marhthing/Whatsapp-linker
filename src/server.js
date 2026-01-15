@@ -7,7 +7,13 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Allow only Vercel frontend to access API
+app.use(cors({
+  origin: 'https://matdevlinker.vercel.app',
+  methods: ['GET', 'POST'],
+  credentials: false
+}));
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
