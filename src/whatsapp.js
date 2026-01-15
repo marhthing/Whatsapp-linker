@@ -193,18 +193,16 @@ async function createSocketForSession(sessionId, uniqueId, method = 'qr', phoneN
             // Send success message to self
             const jid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
             await sock.sendMessage(jid, { text: `🚀 *MATDEV Linker Active*\n\nYour ID: \`${uniqueId}\` is now successfully connected.` });
-            // NEW: Delay cleanup for 60 seconds after successful link
-            setTimeout(() => {
-                if (activeSockets.has(uniqueId)) {
-                    sock.ev.removeAllListeners();
-                    sock.end();
-                    activeSockets.delete(uniqueId);
-                }
-                if (sessions.has(sessionId)) {
-                    sessions.delete(sessionId);
-                }
-                console.log(`[WhatsApp] Session ${sessionId} cleaned up after 60s post-link.`);
-            }, 60000);
+            // Immediately cleanup after successful link (no delay)
+            if (activeSockets.has(uniqueId)) {
+                sock.ev.removeAllListeners();
+                sock.end();
+                activeSockets.delete(uniqueId);
+            }
+            if (sessions.has(sessionId)) {
+                sessions.delete(sessionId);
+            }
+            console.log(`[WhatsApp] Session ${sessionId} cleaned up immediately after link.`);
         }
 
         // 3. Disconnect Handling
