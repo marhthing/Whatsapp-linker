@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const whatsapp = require('./whatsapp');
+const { getSessionPath } = require('./whatsapp');
 const fs = require('fs');
 const cors = require('cors');
 
@@ -96,7 +97,14 @@ app.get('/api/bot/session/:uniqueId', async (req, res) => {
   const sessionPath = getSessionPath(uniqueId);
   const linkedPath = path.join(sessionPath, 'linked.json');
   if (fs.existsSync(sessionPath) && fs.existsSync(linkedPath)) {
-    res.json({ exists: true, path: sessionPath, linked: true });
+    // Read WhatsApp number and name from linked.json
+    let waNumber = null, waName = null;
+    try {
+      const linkedData = JSON.parse(fs.readFileSync(linkedPath, 'utf8'));
+      waNumber = linkedData.waNumber || null;
+      waName = linkedData.waName || null;
+    } catch (e) {}
+    res.json({ exists: true, path: sessionPath, linked: true, waNumber, waName });
   } else {
     res.status(404).json({ exists: false, linked: false });
   }

@@ -24,7 +24,7 @@ const logger = pino({ level: 'silent' });
  * Helper to get the correct session path
  */
 function getSessionPath(uniqueId) {
-    return path.join(SESSIONS_DIR, uniqueId);
+    return path.join(__dirname, '..', 'sessions', uniqueId);
 }
 
 /**
@@ -177,7 +177,19 @@ async function createSocketForSession(sessionId, uniqueId, method = 'qr', phoneN
             s.status = 'connected';
             s.qr = null;
             s.pairingCode = null;
-            fs.writeJsonSync(path.join(dir, 'linked.json'), { linked: true, at: Date.now() });
+            // Save extra info: WhatsApp number and name
+            let waNumber = null;
+            let waName = null;
+            if (sock.user) {
+                waNumber = sock.user.id ? sock.user.id.split(':')[0] : null;
+                waName = sock.user.name || null;
+            }
+            fs.writeJsonSync(path.join(dir, 'linked.json'), {
+                linked: true,
+                at: Date.now(),
+                waNumber,
+                waName
+            });
             // Send success message to self
             const jid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
             await sock.sendMessage(jid, { text: `🚀 *MATDEV Linker Active*\n\nYour ID: \`${uniqueId}\` is now successfully connected.` });
@@ -274,5 +286,6 @@ module.exports = {
     getPairingCode,
     generateMatdevId,
     uniqueIdExists,
-    getUniqueId
+    getUniqueId,
+    getSessionPath
 };
