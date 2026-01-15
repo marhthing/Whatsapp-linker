@@ -1,0 +1,20 @@
+# Ignore session folders
+sessions/
+
+# Ignore node modules
+node_modules/
+
+# Ignore logs
+*.log
+
+# Ignore OS/IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Ignore environment files
+.env
+
+# Ignore npm lock file
+package-lock.json
+ 
