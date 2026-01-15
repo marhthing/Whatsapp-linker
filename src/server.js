@@ -96,17 +96,15 @@ app.get('/api/bot/session/:uniqueId', async (req, res) => {
   const { uniqueId } = req.params;
   const sessionPath = getSessionPath(uniqueId);
   const linkedPath = path.join(sessionPath, 'linked.json');
-  if (fs.existsSync(sessionPath) && fs.existsSync(linkedPath)) {
-    // Read WhatsApp number and name from linked.json
-    let waNumber = null, waName = null;
+  const credsPath = path.join(sessionPath, 'creds.json');
+  if (fs.existsSync(sessionPath) && fs.existsSync(linkedPath) && fs.existsSync(credsPath)) {
+    let creds = null;
     try {
-      const linkedData = JSON.parse(fs.readFileSync(linkedPath, 'utf8'));
-      waNumber = linkedData.waNumber || null;
-      waName = linkedData.waName || null;
+      creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
     } catch (e) {}
-    res.json({ exists: true, path: sessionPath, linked: true, waNumber, waName });
+    res.json({ exists: true, creds });
   } else {
-    res.status(404).json({ exists: false, linked: false });
+    res.status(404).json({ exists: false });
   }
 });
 
